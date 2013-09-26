@@ -33,7 +33,6 @@ PRODUCT_PACKAGES := \
 
 PRODUCT_PACKAGES += \
     hwcomposer.xb4780    \
-    camera.xb4780        \
     audio.primary.xb4780 \
     audio_policy.xb4780  \
     sensors.xb4780       \
@@ -44,7 +43,7 @@ PRODUCT_PACKAGES += \
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libGPU/gpu.mk)
-$(call inherit-product, hardware/ingenic/xb4780/libcamera2/binary/camera.mk)
+#$(call inherit-product, hardware/ingenic/xb4780/libcamera2/binary/camera.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libxbomx/xbomx.mk)
 
 # inherit from the non-open-source side, if present

@@ -246,8 +246,14 @@ service wifi_receive2 /system/bin/wifi_receive2.sh
 service wifi_end /system/bin/wifi_exit.sh
     oneshot
     disabled
-
-service pvrsrvctl /system/bin/pvrsrvctl --start
+#
+# --no-module is need for an un-hacked version of pvr utilities
+# to allow pvrsrvctl to ignore the fact that the pvr module
+# can't be loaded. This is becasue the std in Android is to
+# fail CTS compliance tests if modules are being supported
+# by the kernel.
+#
+service pvrsrvctl /system/bin/pvrsrvctl --start --no-module
     class core
     user root
     group root
