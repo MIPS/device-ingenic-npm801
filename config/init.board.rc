@@ -52,9 +52,6 @@ on post-fs
     mkdir /data/vendor/bin 0777 system system
     mkdir /data/vendor/app 0755 system system   
     mkdir /data/vendor/lib 0777 system system
-    #exec /system/bin/sh /system/etc/vendorprepare.sh
-    chown system system /data/vendor/bin/ABI_filter
-    chmod 755 /data/vendor/bin/ABI_fil
 
     # enable battery driver
     # write /proc/jz47xx_battery/enable 1
@@ -76,13 +73,16 @@ on post-fs-data
     chmod 4755 /system/etc/ppp/ip-down
 
 #set bcm4330 bt mac cfg
-	chmod 0770 /data/misc/bluetooth/
+    chmod 0770 /data/misc/bluetooth
 
 #change perms of dhcp and wifi socket
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     mkdir /data/misc/wifi/sockets 0777 wifi wifi
     mkdir /data/system 1775 system system
     mkdir /data/system/wpa_supplicant 1775 wifi wifi
+
+    # Work around a KK issue with wpa_supplicant
+    symlink /dev/socket/wpa_global /data/system/wpa_supplicant/wlan0
 
     chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
     chmod 0660 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
@@ -142,25 +142,22 @@ service disk_preparing /system/etc/disk_preparing.sh
 service sdcard /system/bin/sdcard /data/media /mnt/shell/emulated 1023 1023
     class late_start
 
-# add dhcpcd and wpa_supplicant services for wlan
-# >>>>>NOTICE THE NAME<<<<<
-# add dhcpcd and wpa_supplicant services for wlan
-# service wpa_supplicant /system/bin/wpa_supplicant -Dwext -c/data/misc/wifi/wpa_supplicant.conf
-# service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 \
-# 	-csystem/etc/wifi/wpa_supplicant.conf -e/data/misc/wifi/entropy.bin
-# 	class main
-# 	socket wpa_wlan0 dgram 660 wifi wifi
-# 	disabled
-# 	oneshot
-
-service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf
-   disabled
-   oneshot
+service wpa_supplicant /system/bin/wpa_supplicant \
+                       -g@android:wpa_global \
+                       -iwlan0 -Dnl80211 \
+                       -O/data/misc/wifi/sockets \
+                       -c/data/misc/wifi/wpa_supplicant.conf \
+                       -e/data/misc/wifi/entropy.bin
+    class main
+    socket wpa_wlan0 dgram 660 wifi wifi
+    socket wpa_global dgram 660 wifi wifi
+    disabled
+    oneshot
 
 service dhcpcd_bnep0 /system/bin/dhcpcd -ABKL
-	 class main
-	 disabled
-	 oneshot
+    class main
+    disabled
+    oneshot
 
 #================= BCM
 # add dhcpcd and wpa_supplicant services for wlan0
@@ -247,12 +244,8 @@ service wifi_end /system/bin/wifi_exit.sh
     oneshot
     disabled
 #
-# --no-module is need for an un-hacked version of pvr utilities
-# to allow pvrsrvctl to ignore the fact that the pvr module
-# can't be loaded. This is becasue the std in Android is to
-# fail CTS compliance tests if modules are being supported
-# by the kernel.
-#
+# To pass CTS the kernel must not use modules.
+# Use --no-module as there is no kernel module to load
 service pvrsrvctl /system/bin/pvrsrvctl --start --no-module
     class core
     user root
