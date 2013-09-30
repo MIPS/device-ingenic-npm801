@@ -1,0 +1,38 @@
+From 7f65ebe19fe7b3505804ac53f6b8305cb546481a Mon Sep 17 00:00:00 2001
+From: Chris Dearman <chris.dearman@imgtec.com>
+Date: Fri, 27 Sep 2013 07:51:08 -0700
+Subject: [PATCH] Make nl80211 driver to quietly ignore private command errors
+
+The KK PDK is sending commands that the driver does not recognise:
+BTCOEXSCAN-STOP
+RXFILTER-STOP
+RXFILTER-ADD
+RXFILTER-START
+RXFILTER-REMOVE
+SETBAND
+BTCOEXMODE
+
+For now just ignore any errors from private commands
+
+Change-Id: I3c22636196b39906d4c8aff0e2fd9d26a945732d
+---
+ bcmdhd/wpa_supplicant_8_lib/driver_cmd_nl80211.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/bcmdhd/wpa_supplicant_8_lib/driver_cmd_nl80211.c b/bcmdhd/wpa_supplicant_8_lib/driver_cmd_nl80211.c
+index 720243e..7b9a340 100644
+--- a/bcmdhd/wpa_supplicant_8_lib/driver_cmd_nl80211.c
++++ b/bcmdhd/wpa_supplicant_8_lib/driver_cmd_nl80211.c
+@@ -71,7 +71,8 @@ int wpa_driver_nl80211_driver_cmd(void *priv, char *cmd, char *buf,
+ 
+ 		if ((ret = ioctl(drv->global->ioctl_sock, SIOCDEVPRIVATE + 1, &ifr)) < 0) {
+ 			wpa_printf(MSG_ERROR, "%s: failed to issue private commands\n", __func__);
+-			wpa_driver_send_hang_msg(drv);
++			// wpa_driver_send_hang_msg(drv);
++                        ret = 0;
+ 		} else {
+ 			drv_errors = 0;
+ 			ret = 0;
+-- 
+1.8.3.4.837.g0bde8c0
+
