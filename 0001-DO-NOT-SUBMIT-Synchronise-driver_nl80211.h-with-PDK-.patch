@@ -1,0 +1,78 @@
+From 3a4f3554f482d294f30340c9c3947068823104f6 Mon Sep 17 00:00:00 2001
+From: Chris Dearman <chris.dearman@imgtec.com>
+Date: Mon, 30 Sep 2013 17:52:24 -0700
+Subject: [PATCH] [DO NOT SUBMIT] Synchronise driver_nl80211.h with PDK
+ wpa_supplicant_8
+
+This is a temporary workaround to allow this library to allow
+lib_driver_cmd_bcmdhd to work correctly with the KLP PDK version of
+wpa_supplicant_8 code.
+
+Change-Id: I861c3c024f40a967b43928105e4db49c7526e6cb
+---
+ bcmdhd/wpa_supplicant_8_lib/driver_nl80211.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/bcmdhd/wpa_supplicant_8_lib/driver_nl80211.h b/bcmdhd/wpa_supplicant_8_lib/driver_nl80211.h
+index 5b72800..ba1ba0f 100644
+--- a/bcmdhd/wpa_supplicant_8_lib/driver_nl80211.h
++++ b/bcmdhd/wpa_supplicant_8_lib/driver_nl80211.h
+@@ -65,6 +65,8 @@
+ struct nl80211_global {
+ 	struct dl_list interfaces;
+ 	int if_add_ifindex;
++	u64 if_add_wdevid;
++	int if_add_wdevid_set;
+ 	struct netlink_data *netlink;
+ 	struct nl_cb *nl_cb;
+ 	struct nl_handle *nl;
+@@ -89,16 +91,19 @@ struct i802_bss {
+ 	struct wpa_driver_nl80211_data *drv;
+ 	struct i802_bss *next;
+ 	int ifindex;
++	u64 wdev_id;
+ 	char ifname[IFNAMSIZ + 1];
+ 	char brname[IFNAMSIZ];
+ 	unsigned int beacon_set:1;
+ 	unsigned int added_if_into_bridge:1;
+ 	unsigned int added_bridge:1;
+ 	unsigned int in_deinit:1;
++	unsigned int wdev_id_set:1;
+ 
+ 	u8 addr[ETH_ALEN];
+ 
+ 	int freq;
++	int if_dynamic;
+ 
+ 	void *ctx;
+ 	struct nl_handle *nl_preq, *nl_mgmt;
+@@ -120,6 +125,8 @@ struct wpa_driver_nl80211_data {
+ 	int ignore_if_down_event;
+ 	struct rfkill_data *rfkill;
+ 	struct wpa_driver_capa capa;
++	u8 *extended_capa, *extended_capa_mask;
++	unsigned int extended_capa_len;
+ 	int has_capability;
+ 
+ 	int operstate;
+@@ -129,7 +136,9 @@ struct wpa_driver_nl80211_data {
+ 	struct nl_cb *nl_cb;
+ 
+ 	u8 auth_bssid[ETH_ALEN];
++	u8 auth_attempt_bssid[ETH_ALEN];
+ 	u8 bssid[ETH_ALEN];
++	u8 prev_bssid[ETH_ALEN];
+ 	int associated;
+ 	u8 ssid[32];
+ 	size_t ssid_len;
+@@ -151,6 +160,7 @@ struct wpa_driver_nl80211_data {
+ 	unsigned int retry_auth:1;
+ 	unsigned int use_monitor:1;
+ 	unsigned int ignore_next_local_disconnect:1;
++	unsigned int allow_p2p_device:1;
+ 
+ 	u64 remain_on_chan_cookie;
+ 	u64 send_action_cookie;
+-- 
+1.8.3.4.837.g0bde8c0
+
