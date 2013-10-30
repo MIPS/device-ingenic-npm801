@@ -247,7 +247,8 @@ service wifi_end /system/bin/wifi_exit.sh
     oneshot
     disabled
 
-service pvrsrvctl /system/bin/pvrsrvctl --start
+#  --no-module indicates that it's ok that pvr isn't loaded as a module.
+service pvrsrvctl /system/bin/pvrsrvctl --start --no-module
     class core
     user root
     group root
