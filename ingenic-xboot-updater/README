@@ -12,3 +12,4 @@ This tool can help you update boot loader on NPM801 and Warrior by USB cable.
 5. $ cd ingenic-xboot-updater
 
 6. $ sudo ./ingenic-xboot-updater --boot=x-boot-nand.bin
+
