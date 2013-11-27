@@ -83,12 +83,6 @@ PRODUCT_COPY_FILES += \
  PRODUCT_COPY_FILES += \
      $(LOCAL_PATH)/config/apns-conf.xml:system/etc/apns-conf.xml
 
-# Bluetooth configuration files
-PRODUCT_COPY_FILES += \
-    system/bluetooth/data/main.le.conf:system/etc/bluetooth/main.conf \
-    system/bluetooth/data/input.conf:system/etc/bluetooth/input.conf \
-    system/bluetooth/data/audio.conf:system/etc/bluetooth/audio.conf
-
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/IW/bcm4330/fw_bcm4330b2.bin:system/lib/wifi/firmware/iw8101/fw_bcmdhd.bin \
     $(LOCAL_PATH)/wifi/IW/bcm4330/nv_4330b2.txt:system/lib/wifi/firmware/iw8101/nvram_iw8101.txt \
