@@ -41,10 +41,22 @@ PRODUCT_PACKAGES += \
     libdmmu              \
 	audio.a2dp.default   \
     libjzipu
+#
+# Now Building libxbomx packages/modules from source.
+#
+PRODUCT_PACKAGES += \
+    libstagefrighthw \
+    libstagefright_hard_alume \
+    libstagefright_hard_vlume \
+    libstagefright_hard_x264hwenc \
+    libOMX_Core
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libGPU/gpu.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libcamera2/binary/camera.mk)
+
+# Copy H263/MPEG4 Firmware (mpeg4_p1.bin) to /system/etc
+#
 $(call inherit-product, hardware/ingenic/xb4780/libxbomx/xbomx.mk)
 
 # inherit from the non-open-source side, if present
