@@ -79,7 +79,6 @@ Only the three quirks included above are recognized at this point:
     <Decoders>
 	<!-- Ingenic H/W Accelerated LUME Decoders -->
 	<MediaCodec name="OMX.LUMEVideoDecoder" type="video/avc" />
-	<MediaCodec name="OMX.LUMEVideoDecoder" type="video/mp4v-es" />
 	<MediaCodec name="OMX.LUMEVideoDecoder" type="video/lume" />
 	<MediaCodec name="OMX.LUMEVideoDecoder" type="video/wmv3" />   <!-- Tested -->
 	<MediaCodec name="OMX.LUMEVideoDecoder" type="video/rv40" />   <!-- Test -->
