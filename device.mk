@@ -53,7 +53,6 @@ PRODUCT_PACKAGES += \
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libGPU/gpu.mk)
-$(call inherit-product, hardware/ingenic/xb4780/libcamera2/binary/camera.mk)
 
 # Copy H263/MPEG4 Firmware (mpeg4_p1.bin) to /system/etc
 #
