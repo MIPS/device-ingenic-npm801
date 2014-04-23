@@ -146,8 +146,6 @@ PRODUCT_PROPERTY_OVERRIDES +=    \
     wifi.supplicant_scan_interval=15
 
 PRODUCT_PROPERTY_OVERRIDES +=    \
-    rild.libpath=/system/lib/libreference-ril.so    \
-    rild.libargs=-d /dev/ttyM1                      \
     ro.telephony.call_ring.multiple=0               \
     mobiled.libpath=/system/lib/libmobiled.so
 
