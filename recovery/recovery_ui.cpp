@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,10 @@ class MyDeviceUI : public ScreenRecoveryUI {
     }
 
     virtual KeyAction CheckKey(int key) {
-        if (key == KEY_HOME) {
-            consecutive_power_keys = 0;
+        if (IsKeyPressed(KEY_POWER) && key == KEY_VOLUMEUP) {
             return TOGGLE;
         }
-
-        if (key == KEY_END) {
-        //if (key == KEY_POWER) {
+        if (key == KEY_POWER) {
             ++consecutive_power_keys;
             if (consecutive_power_keys >= 7) {
                 return REBOOT;
@@ -82,8 +79,7 @@ class MyDevice : public Device {
               case KEY_VOLUMEUP:
                 return kHighlightUp;
 
-              case KEY_END:
-              //case KEY_POWER:
+              case KEY_POWER:
                 return kInvokeItem;
             }
         }
