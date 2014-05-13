@@ -1,0 +1,2 @@
+on init
+    write /dev/nand_char "CMD_INSTALL_PARTITION:ALL"

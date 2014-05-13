@@ -29,7 +29,8 @@ PRODUCT_PACKAGES := \
     mke2fs          \
     mke2fs_host     \
     e2fsck          \
-    e2fsck_host
+    e2fsck_host     \
+    nand_flash_image
 
 PRODUCT_PACKAGES += \
     hwcomposer.xb4780    \
@@ -73,6 +74,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/dhcpcd.conf:system/etc/dhcpcd/dhcpcd.conf                            \
     $(LOCAL_PATH)/config/init.board.rc:root/init.$(TARGET_BOARD_NAME).rc                      \
     $(LOCAL_PATH)/config/init.board.usb.rc:root/init.$(TARGET_BOARD_NAME).usb.rc              \
+    $(LOCAL_PATH)/config/init.recovery.board.rc:root/init.recovery.$(TARGET_BOARD_NAME).rc    \
     $(LOCAL_PATH)/config/fstab.board:root/fstab.$(TARGET_BOARD_NAME)                          \
     $(LOCAL_PATH)/config/vold.fstab:system/etc/vold.fstab                                     \
     $(LOCAL_PATH)/config/ueventd.board.rc:root/ueventd.$(TARGET_BOARD_NAME).rc                \
