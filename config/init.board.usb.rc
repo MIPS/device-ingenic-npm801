@@ -8,6 +8,7 @@ on boot
     chmod 0660 /sys/class/android_usb/android0/f_mass_storage/lun2/file
     chown system system /sys/class/android_usb/android0/f_rndis/ethaddr
     chmod 0660 /sys/class/android_usb/android0/f_rndis/ethaddr
+    write /sys/class/android_usb/android0/iSerial ${ro.serialno}
 
 # Used to disable USB when switching states
 on property:sys.usb.config=none
