@@ -1,3 +1,5 @@
+import init.${ro.hardware}.usb.rc
+
 on init
     write /dev/nand_char "CMD_INSTALL_PARTITION:ALL"
 
