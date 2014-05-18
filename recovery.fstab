@@ -2,6 +2,6 @@
 /dev/block/ndsystem                     /system     ext4   defaults               defaults
 /dev/block/nddata                       /data       ext4   defaults               defaults
 /dev/block/ndcache                      /cache      ext4   defaults               defaults
-/devices/platform/jzmmc.0/mmc_host/mmc0 /sdcard     vfat   defaults               defaults
+/dev/block/mmcblk0p1                    /sdcard     vfat   defaults               defaults
 /dev/block/ndboot                       /boot       emmc    defaults               defaults
 /dev/block/ndrecovery                   /recovery   emmc    defaults               defaults
