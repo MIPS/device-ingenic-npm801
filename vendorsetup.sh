@@ -20,4 +20,7 @@
 # In particular, you can add lunch options with the add_lunch_combo
 # function: add_lunch_combo generic-eng
 
+# The full_npm801 target is deprecated. Leave it here to
+# aid migration to aosp_npm801
 add_lunch_combo full_npm801-userdebug
+add_lunch_combo aosp_npm801-userdebug
