@@ -82,4 +82,9 @@ BT_BCM4330                  := true
 TARGET_RECOVERY_UI_LIB := librecovery_ui_npm801
 TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 
-WITH_JIT := true
+ifeq ($(HOST_OS),linux)
+  ifeq ($(WITH_DEXPREOPT),)
+    WITH_DEXPREOPT := true
+  endif
+endif
+
