@@ -52,6 +52,13 @@ PRODUCT_PACKAGES += \
     libstagefright_hard_x264hwenc \
     libOMX_Core
 
+#
+# WiFi support
+#
+PRODUCT_PACKAGES += \
+    wpa_supplicant \
+    wpa_supplicant.conf
+
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libGPU/gpu.mk)
 
