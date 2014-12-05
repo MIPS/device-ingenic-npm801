@@ -36,7 +36,7 @@ PRODUCT_PACKAGES += \
     hwcomposer.xb4780    \
     camera.xb4780        \
     audio.primary.xb4780 \
-    audio_policy.xb4780  \
+    audio_policy.default \
     sensors.xb4780       \
     lights.xb4780        \
     libdmmu              \

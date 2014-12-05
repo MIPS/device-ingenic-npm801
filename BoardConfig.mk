@@ -20,6 +20,8 @@
 # definition file).
 #
 
+USE_LEGACY_AUDIO_POLICY := 1
+
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_KERNEL := false
 TARGET_NO_RADIOIMAGE := true
