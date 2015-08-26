@@ -62,11 +62,8 @@ class MyDeviceUI : public ScreenRecoveryUI {
 
 class MyDevice : public Device {
   public:
-    MyDevice() :
-        ui(new MyDeviceUI) {
+    MyDevice() : Device(new MyDeviceUI) {
     }
-
-    RecoveryUI* GetUI() { return ui; }
 
     int HandleMenuKey(int key_code, int visible) {
         if (visible) {
@@ -91,7 +88,7 @@ class MyDevice : public Device {
         switch (menu_position) {
           case 0: return REBOOT;
           case 1: return APPLY_ADB_SIDELOAD;
-          case 2: return APPLY_EXT;
+          case 2: return APPLY_SDCARD;
           case 3: return WIPE_DATA;
           case 4: return WIPE_CACHE;
           default: return NO_ACTION;
@@ -101,8 +98,6 @@ class MyDevice : public Device {
     const char* const* GetMenuHeaders() { return HEADERS; }
     const char* const* GetMenuItems() { return ITEMS; }
 
-  private:
-    RecoveryUI* ui;
 };
 
 Device* make_device() {
