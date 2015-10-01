@@ -90,3 +90,10 @@ ifeq ($(HOST_OS),linux)
   endif
 endif
 
+BOARD_SEPOLICY_DIRS += \
+	device/ingenic/npm801/sepolicy
+
+BOARD_SEPOLICY_UNION += \
+        file_contexts \
+        pvrsrvcrl.te \
+        disk_prepare.te

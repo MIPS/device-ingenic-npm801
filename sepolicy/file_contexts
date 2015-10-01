@@ -1,0 +1,3 @@
+##### file_contexts
+/system/etc/disk_preparing(.*)  u:object_r:disk_preparing_exec:s0
+/system/vendor/bin/pvrsrvctl    u:object_r:pvrsrvctl_exec:s0
