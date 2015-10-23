@@ -1,0 +1,3 @@
+allow kernel ndapanic_block_device:blk_file { read write open };
+allow kernel nand_char_device:chr_file { read write open };
+allow kernel block_device:dir search;

@@ -1,7 +1,8 @@
 #!/system/bin/sh
 #run once
 
-/system/bin/mount -t ext4 -o noatime,nosuid,nodev,nomblk_io_submit,errors=panic /dev/block/nddata /data
+# already monted by init.board.rc script
+#/system/bin/mount -t ext4 -o noatime,nosuid,nodev,nomblk_io_submit,errors=panic /dev/block/nddata /data
 
 if [ ! -f /data/system/packages.list ]; then
 	#######################################################################

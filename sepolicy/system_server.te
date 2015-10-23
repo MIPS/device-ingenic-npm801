@@ -1,0 +1,2 @@
+allow system_server orientation_sensor_device:chr_file { read write ioctl open };
+allow system_server gsensor_device:chr_file { read write ioctl open };

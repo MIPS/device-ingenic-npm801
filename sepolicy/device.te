@@ -1,0 +1,7 @@
+type nddata_block_device, dev_type;
+type ndsystem_block_device, dev_type;
+type ndcache_block_device, dev_type;
+type nand_char_device, dev_type;
+type ndapanic_block_device, dev_type;
+type gsensor_device, dev_type;
+type orientation_sensor_device, dev_type;

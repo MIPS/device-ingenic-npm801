@@ -30,10 +30,11 @@ on init
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
 on fs
-    mount ext4 /dev/block/ndsystem /system
-    #write /proc/exec /system/bin/sh:/system/etc/disk_preparing.sh
+    mount ext4 /dev/block/ndsystem /system ro
+    # mount data so disk_preparing can check for first boot
+    # will be unmounted by disk_preparing
+    mount ext4 /dev/block/nddata /data ro noatime nosuid nodev
     # create /data and /cache filesystem if necessary
-    chmod 0755 /system/etc/disk_preparing.sh
     class_start ingenic
     wait /dev/disk_preparing_done 100
     mount_all /fstab.npm801
@@ -53,10 +54,6 @@ on post-fs
 on post-fs-data
     #for pppoe
     chmod 0777 /data/etc/ppp/pppoe.conf
-
-#set ril
-    chown root /system/bin/pppd
-    chmod 4755 /system/bin/pppd
 
 #set ppp
     chown root /system/etc/ppp/ip-up
@@ -122,7 +119,7 @@ on boot
 #    setprop ro.com.google.locationfeatures 1
 
 # create /data and /cache filesystems if necessary
-service disk_preparing /system/etc/disk_preparing.sh
+service disk_preparing /vendor/bin/disk_preparing.sh
     class ingenic
     oneshot
 

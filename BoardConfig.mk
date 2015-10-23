@@ -95,5 +95,14 @@ BOARD_SEPOLICY_DIRS += \
 
 BOARD_SEPOLICY_UNION += \
         file_contexts \
-        pvrsrvcrl.te \
-        disk_prepare.te
+        pvrsrvctl.te \
+        disk_prepare.te \
+        fsck.te \
+        init.te \
+        kernel.te \
+        device.te \
+        system_server.te \
+        toolbox.te \
+        bluetooth.te \
+        mke2fs.te \
+        netd.te

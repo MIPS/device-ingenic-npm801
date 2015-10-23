@@ -4,3 +4,16 @@ type disk_preparing_exec, exec_type, file_type;
 
 # Started by init
 init_daemon_domain(disk_preparing)
+
+allow disk_preparing device:dir { write add_name };
+allow disk_preparing device:file { write create open };
+allow disk_preparing fsck_exec:file { read getattr open execute execute_no_trans };
+allow disk_preparing shell_exec:file read;
+allow disk_preparing nddata_block_device:blk_file { read open ioctl write getattr };
+allow disk_preparing ndsystem_block_device:blk_file { setattr };
+allow disk_preparing ndcache_block_device:blk_file { write  getattr read ioctl open };
+allow disk_preparing mke2fs_exec:file { read getattr open execute execute_no_trans };
+allow disk_preparing block_device:dir search;
+allow disk_preparing self:capability sys_admin;
+allow disk_preparing kernel:process setsched;
+allow disk_preparing labeledfs:filesystem unmount;

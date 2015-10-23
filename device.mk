@@ -88,7 +88,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/disk_preparing.sh:system/etc/disk_preparing.sh                       
+    $(LOCAL_PATH)/config/disk_preparing.sh:system/vendor/bin/disk_preparing.sh
 
 # Media Codecs List
 PRODUCT_COPY_FILES += \

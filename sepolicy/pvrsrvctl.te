@@ -3,3 +3,6 @@ type pvrsrvctl_exec, exec_type, file_type;
 
 # Started by init
 init_daemon_domain(pvrsrvctl)
+
+allow pvrsrvctl gpu_device:chr_file { read write ioctl open };
+allow pvrsrvctl self:capability sys_module;

@@ -1,0 +1,1 @@
+allow toolbox nddata_block_device:blk_file { read ioctl open };

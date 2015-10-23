@@ -1,0 +1,10 @@
+# mke2fs_exec
+type mke2fs, domain;
+type mke2fs_exec, exec_type, file_type;
+
+# Started by init
+init_daemon_domain(mke2fs)
+
+allow mke2fs system_file:file execute_no_trans;
+allow mke2fs ndcache_block_device:blk_file { read write getattr open ioctl };
+allow mke2fs nddata_block_device:blk_file { read write getattr open ioctl };
