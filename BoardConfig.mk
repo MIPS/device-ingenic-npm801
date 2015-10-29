@@ -92,17 +92,3 @@ endif
 
 BOARD_SEPOLICY_DIRS += \
 	device/ingenic/npm801/sepolicy
-
-BOARD_SEPOLICY_UNION += \
-        file_contexts \
-        pvrsrvctl.te \
-        disk_prepare.te \
-        fsck.te \
-        init.te \
-        kernel.te \
-        device.te \
-        system_server.te \
-        toolbox.te \
-        bluetooth.te \
-        mke2fs.te \
-        netd.te

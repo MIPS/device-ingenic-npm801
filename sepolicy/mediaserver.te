@@ -1,0 +1,2 @@
+allow mediaserver graphics_device:chr_file { read write ioctl open };
+allow mediaserver graphics_device:dir search;
