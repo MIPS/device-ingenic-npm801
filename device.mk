@@ -134,6 +134,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/gpio-keys.kl:/system/usr/keylayout/gpio-keys.kl
 
+# Magiccode libakim
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/akim/libakim.so:/system/vendor/lib/libakim.so \
+    $(LOCAL_PATH)/akim/magiccode_prefs.xml:/data/system/magiccode_prefs.xml
+
 #############################################################################################
 
 PRODUCT_AAPT_CONFIG := normal ldpi mdpi
