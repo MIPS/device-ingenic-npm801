@@ -137,7 +137,7 @@ PRODUCT_COPY_FILES += \
 # Magiccode libakim
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/akim/libakim.so:/system/vendor/lib/libakim.so \
-    $(LOCAL_PATH)/akim/magiccode_prefs.xml:/data/system/magiccode_prefs.xml
+    $(LOCAL_PATH)/akim/magiccode_prefs.xml:/system/etc/magiccode_prefs.xml
 
 #############################################################################################
 
