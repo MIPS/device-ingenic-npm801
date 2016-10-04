@@ -40,8 +40,10 @@ PRODUCT_PACKAGES += \
     sensors.xb4780       \
     lights.xb4780        \
     libdmmu              \
-	audio.a2dp.default   \
-    libjzipu
+    audio.a2dp.default   \
+    libjzipu             \
+    libdrm
+
 #
 # Now Building libxbomx packages/modules from source.
 #
@@ -84,7 +86,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/init.recovery.board.rc:root/init.recovery.$(TARGET_BOARD_NAME).rc    \
     $(LOCAL_PATH)/config/fstab.board:root/fstab.$(TARGET_BOARD_NAME)                          \
     $(LOCAL_PATH)/config/ueventd.board.rc:root/ueventd.$(TARGET_BOARD_NAME).rc                \
-    $(LOCAL_PATH)/config/bt_addr:system/etc/firmware/bcm4330/bt_addr			      \
+    $(LOCAL_PATH)/config/bt_addr:system/etc/firmware/bcm4330/bt_addr                          \
     $(LOCAL_PATH)/config/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
 PRODUCT_COPY_FILES += \
