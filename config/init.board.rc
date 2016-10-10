@@ -99,6 +99,13 @@ on boot
 #Set StrictMode Quietly 
 #    setprop persist.sys.strictmode.visual 0
 
+    # There are no special/dedicated CPUs, let everything run everywhere.
+    write /dev/cpuset/foreground/cpus 0-1
+    write /dev/cpuset/foreground/boost/cpus 0-1
+    write /dev/cpuset/background/cpus 0-1
+    write /dev/cpuset/system-background/cpus 0-1
+    write /dev/cpuset/top-app/cpus 0-1
+
 #    setprop ro.build.withbluetooth 0
 #    setprop ro.tether.denied true
     setprop persist.sys.usb.config adb
