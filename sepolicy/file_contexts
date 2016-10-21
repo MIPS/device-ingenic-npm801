@@ -1,3 +1,4 @@
+esyscmd(`[ -n "$WITH_SDCARD" -a "$WITH_SDCARD" = "true" ] && echo "define(\`WITH_SDCARD')"')
 /dev/dmmu                              u:object_r:gpu_device:s0
 /dev/fscklogs                          u:object_r:fscklogs:s0
 /dev/ipu0                              u:object_r:gpu_device:s0
@@ -7,8 +8,8 @@
 /dev/g_sensor                          u:object_r:gsensor_device:s0
 /dev/pvr_sync                          u:object_r:gpu_device:s0
 /dev/cim                               u:object_r:camera_device:s0
-/dev/block/nddata                      u:object_r:nddata_block_device:s0
-/dev/block/ndsystem                    u:object_r:ndsystem_block_device:s0
+ifdef(`WITH_SDCARD',/dev/block/mmcblk0p4,/dev/block/nddata)   u:object_r:nddata_block_device:s0
+ifdef(`WITH_SDCARD',/dev/block/mmcblk0p2,/dev/block/ndsystem) u:object_r:ndsystem_block_device:s0
 /dev/block/ndcache                     u:object_r:ndcache_block_device:s0
 /dev/block/ndapanic                    u:object_r:ndapanic_block_device:s0
 /dev/nand_char                         u:object_r:nand_char_device:s0

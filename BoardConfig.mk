@@ -41,8 +41,16 @@ TARGET_BOOTLOADER_BOARD_NAME := npm801
 TARGET_AAPT_CHARACTERISTICS := tablet
 PRODUCT_VENDOR_KERNEL_HEADERS := hardware/ingenic/xb4780/kernel-headers
 TARGET_USERIMAGES_USE_EXT4 := true
-# system size is 640M
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 671088640
+ifeq ($(WITH_SDCARD),true)
+  # If you change this number you also need to change the size of
+  # partition 2 in sdcardinstaller/mksdcard-ext4.
+  # 1835008000 == 1750 * 1024 * 1024
+  BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1835008000
+else
+  WITH_SDCARD := false
+  # system size is 640M
+  BOARD_SYSTEMIMAGE_PARTITION_SIZE := 671088640
+endif
 # data size is 960M
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 1006632960
 # cache size is 30M
@@ -90,7 +98,7 @@ TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 
 ifeq ($(HOST_OS),linux)
   ifeq ($(WITH_DEXPREOPT),)
-    WITH_DEXPREOPT := true
+    WITH_DEXPREOPT := $(WITH_SDCARD)
   endif
 endif
 

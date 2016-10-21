@@ -78,13 +78,21 @@ $(call inherit-product-if-exists, vendor/google/products/gms.mk)
 #WIFI_BAND             := 802_11_ABG
 #$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
 
+ifeq ($(WITH_SDCARD),true)
+    NPM801_USE_SDCARD=-sdcard
+else
+    NPM801_USE_SDCARD=
+endif
+
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/recovery$(NPM801_USE_SDCARD).fstab
+
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
     $(LOCAL_PATH)/config/dhcpcd.conf:system/etc/dhcpcd/dhcpcd.conf                            \
-    $(LOCAL_PATH)/config/init.board.rc:root/init.$(TARGET_BOARD_NAME).rc                      \
+    $(LOCAL_PATH)/config/init$(NPM801_USE_SDCARD).board.rc:root/init.$(TARGET_BOARD_NAME).rc  \
     $(LOCAL_PATH)/config/init.board.usb.rc:root/init.$(TARGET_BOARD_NAME).usb.rc              \
     $(LOCAL_PATH)/config/init.recovery.board.rc:root/init.recovery.$(TARGET_BOARD_NAME).rc    \
-    $(LOCAL_PATH)/config/fstab.board:root/fstab.$(TARGET_BOARD_NAME)                          \
+    $(LOCAL_PATH)/config/fstab$(NPM801_USE_SDCARD).board:root/fstab.$(TARGET_BOARD_NAME)      \
     $(LOCAL_PATH)/config/ueventd.board.rc:root/ueventd.$(TARGET_BOARD_NAME).rc                \
     $(LOCAL_PATH)/config/bt_addr:system/etc/firmware/bcm4330/bt_addr                          \
     $(LOCAL_PATH)/config/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf

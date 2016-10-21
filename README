@@ -18,7 +18,26 @@ Building Android
 2. Choose target:
     $ lunch aosp_npm801-userdebug
 
-3. Build everything.
+3. Starting with Nougat decide whether you want to install Android
+   into the tablet's NAND only, or to place the /system & /data
+   file systems in SD card.
+
+   a. To select installing Android using both NAND, and SD card use
+
+              export WITH_SDCARD=true
+
+   b. To install only into NAND you'll need to make sure that
+      WITH_SDCARD is undefined (unset WITH_SDCARD), or set to "false"
+      (export WITH_SDCARD=false).
+
+   [Note: By default if WITH_SDCARD is true, then WITH_DEXPREOPT is
+   also true. Otherwise, the default value of WITH_DEXPREOPT is false.
+   If you're building for installation in NAND only, (since Nougat)
+   there isn't enough space to use the WITH_DEXPREOPT option so it's
+   unlikely that in this case you would want to override the default
+   value of WITH_DEXPREOPT.]
+
+4. Build everything.
     $ make -j24
 
 Installing bootloader (xboot)
@@ -47,6 +66,10 @@ aosp_npm801.
 Flashing Android to device
 ==========================
 
+These instructions assume that you're only installing Android into NAND.
+That is, you're not using SD card to house the /system, and /data file
+systems. If you're using SD card skip to the next section.
+
 1. Connect the device to PC by USB cable and plug charger into the device.
 
 2. Press 'return' and do a reset; keep 'return' key pressed until
@@ -62,3 +85,37 @@ Flashing Android to device
    # fastboot flashall
 
 The fastboot process takes approximately 15 minutes.
+
+Flashing Android to SD card, and to NAND
+========================================
+
+1. Install SD card into reader. Make note of which Linux device represents
+   the SD card. On my system it's /dev/sde. You'll need the adjust the
+   instructions in this section to match the SD card device on your system.
+
+2. cd $TOP/device/ingenic/npm801/sdcardinstaller
+
+3. sudo umount /dev/sde*
+
+4. sudo dd if=/dev/zero of=/dev/sde bs=512 count=1
+
+   This step may not be needed. Typically, it's needed only if the SD
+   card was previously formatted for use as VFAT device. In any case,
+   running this extra step doesn't hurt anything.
+
+5. ./mksdcard-ext4 /dev/sde
+
+   This step partitions the SD card into 4 partitions but only uses
+   partitions 2, and 4.
+
+6. Install SD card into tablet.
+
+7. Reflash the NAND.
+
+   a. sudo fastboot flash boot
+
+   b. sudo fastboot flash recovery
+
+   c. sudo fastboot reboot
+
+   The tablet will reset, and then boot into Android.
