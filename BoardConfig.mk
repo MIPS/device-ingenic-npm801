@@ -78,6 +78,10 @@ CAMERA_SUPPORT_VIDEOSNAPSHORT := false
 COVERT_WITH_SOFT := true
 CAMERA_VERSION := 1
 
+# Kernel v3.0.8 does not have clock boot time alarm support.
+# This flag is relevant for bluetooth functionalities.
+KERNEL_MISSING_CLOCK_BOOTTIME_ALARM := true
+
 # Wi-Fi hardware selection
 PRODUCT_DEFAULT_WIFI_CHANNELS := 13
 
