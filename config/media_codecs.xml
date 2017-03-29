@@ -77,6 +77,9 @@ Only the three quirks included above are recognized at this point:
 
 <MediaCodecs>
     <Include href="media_codecs_google_audio.xml" />
+    <Settings>
+        <Setting name="max-video-encoder-input-buffers" value="2" />
+    </Settings>
     <Decoders>
         <!-- Ingenic H/W Accelerated LUME Decoders -->
         <MediaCodec name="OMX.LUMEVideoDecoder" >
