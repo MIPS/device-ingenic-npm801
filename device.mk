@@ -149,8 +149,16 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.audio.low_latency.xml:system/etc/permissions/android.hardware.audio.low_latency.xml
 
+USE_XML_AUDIO_POLICY_CONF := 1
+
+#Audio policy
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/audio_policy.conf:system/etc/audio_policy.conf
+    frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration.xml:system/etc/a2dp_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:system/etc/usb_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:system/etc/r_submix_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/default_volume_tables.xml:system/etc/default_volume_tables.xml \
+    $(LOCAL_PATH)/config/audio_policy_configuration.xml:system/etc/audio_policy_configuration.xml \
+    $(LOCAL_PATH)/config/audio_policy_volumes_drc.xml:system/etc/audio_policy_volumes_drc.xml \
 
 # logo
 #PRODUCT_COPY_FILES += \
