@@ -1,7 +1,0 @@
-#<src>                                  <mnt_point> <type> <mnt_flags and options> <fs_mgr_flags>
-/dev/block/ndsystem                     /system     ext4   defaults               defaults
-/dev/block/nddata                       /data       ext4   defaults               defaults
-/dev/block/ndcache                      /cache      ext4   defaults               defaults
-/dev/block/mmcblk0p1                    /sdcard     vfat   defaults               defaults
-/dev/block/ndboot                       /boot       emmc    defaults               defaults
-/dev/block/ndrecovery                   /recovery   emmc    defaults               defaults

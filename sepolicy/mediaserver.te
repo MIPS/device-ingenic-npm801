@@ -1,4 +1,5 @@
-allow mediaserver graphics_device:chr_file { read write ioctl open };
+#============= mediaserver.te ==============
+allow mediaserver graphics_device:chr_file { read write open ioctl};
 allow mediaserver graphics_device:dir search;
 allow mediaserver camera_device:chr_file { read write ioctl open };
 allow mediaserver sensorservice_service:service_manager find;

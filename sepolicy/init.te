@@ -1,8 +1,9 @@
-allow init self:capability sys_nice;
-allow init tmpfs:lnk_file create_file_perms;
-allow init nand_char_device:chr_file write;
-allow init ndcache_block_device:blk_file write;
-allow init nddata_block_device:blk_file write;
-allow init mke2fs_exec:file execute;
-type_transition init disk_preparing_exec:process disk_preparing;
-allow init disk_preparing_exec:file { execute getattr };
+#============= init.te ==============
+allow init self:capability sys_module;
+allow init sysfs:dir w_dir_perms;
+allow init tmpfs:lnk_file create;
+allow init mtd_device:chr_file r_file_perms;
+
+# ConfigFS support sepolicy permissions
+allow init configfs:dir create_dir_perms;
+allow init configfs:{ file lnk_file } create_file_perms;

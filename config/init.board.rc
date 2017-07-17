@@ -1,8 +1,7 @@
 import init.${ro.hardware}.usb.rc
 
 on init
-    write /dev/nand_char "CMD_INSTALL_PARTITION:ALL"
-
+    write /dev/note "init.${ro.hardware}.rc: on init"
     # permissions for bluetooth.
     setprop ro.bt.bdaddr_path "/system/etc/firmware/bcm4330/bt_addr"
     chown bluetooth bluetooth ro.bt.bdaddr_path
@@ -15,48 +14,21 @@ on init
     # for modem uart
     write /sys/class/tty/ttyS1/power/wakeup enabled
 
-    #change the perms of ttyS of radio(rild)
-    chown radio radio  /dev/ttyUSB0
-    chmod 0666 /dev/ttyUSB0
-    chown radio radio  /dev/ttyUSB1
-    chmod 0666 /dev/ttyUSB1
-    chown radio radio  /dev/ttyUSB2
-    chmod 0666 /dev/ttyUSB2
-
     # Support legacy paths
     symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
 
 on fs
-    mount ext4 /dev/block/ndsystem /system ro
-    # mount data so disk_preparing can check for first boot
-    # will be unmounted by disk_preparing
-    mount ext4 /dev/block/nddata /data ro noatime nosuid nodev
-    # create /data and /cache filesystem if necessary
-    class_start ingenic
-    wait /dev/disk_preparing_done 100
-    mount_all /fstab.npm801
-
-on post-fs
-    mkdir /data/vendor 0755 system system
-    mkdir /data/vendor/bin 0777 system system
-    mkdir /data/vendor/app 0755 system system   
-    mkdir /data/vendor/lib 0777 system system
-
-    # enable battery driver
-    # write /proc/jz47xx_battery/enable 1
-    #exec /system/bin/readbattery
-    #exec /system/bin/readbattery update_curve
+    write /dev/note "init.${ro.hardware}.rc: on fs"
+    mount_all /fstab.${ro.hardware}
 
 on post-fs-data
-    #for pppoe
-    chmod 0777 /data/etc/ppp/pppoe.conf
+    write /dev/note "init.${ro.hardware}.rc: on post-fs-data"
 
-#set ppp
-    chown root /system/etc/ppp/ip-up
-    chmod 4755 /system/etc/ppp/ip-up
-    chown root /system/etc/ppp/ip-down
-    chmod 4755 /system/etc/ppp/ip-down
+    mkdir /data/vendor 0755 system system
+    mkdir /data/vendor/bin 0777 system system
+    mkdir /data/vendor/app 0755 system system
+    mkdir /data/vendor/lib 0777 system system
 
 #set bcm4330 bt mac cfg
     chmod 0770 /data/misc/bluetooth
@@ -66,17 +38,6 @@ on post-fs-data
     mkdir /data/misc/wifi/sockets 0777 wifi wifi
     mkdir /data/system 1775 system system
 
-    chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-    chmod 0660 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/timer_rate
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/timer_rate
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/input_boost
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/input_boost
-
     # If there is no fs-post-data action in the init.<device>.rc file, you
     # must uncomment this line, otherwise encrypted filesystems
     # won't work.
@@ -84,20 +45,7 @@ on post-fs-data
     setprop vold.post_fs_data_done 1
 
 on boot
-    chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-    chmod 0660 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/timer_rate
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/timer_rate
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
-    chown system system /sys/devices/system/cpu/cpufreq/interactive/input_boost
-    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/input_boost
-    chown system system /sys/class/backlight/pwm-backlight.0/brightness
-
-#Set StrictMode Quietly 
-#    setprop persist.sys.strictmode.visual 0
+    write /dev/note "init.${ro.hardware}.rc: on boot"
 
     # There are no special/dedicated CPUs, let everything run everywhere.
     write /dev/cpuset/foreground/cpus 0-1
@@ -109,18 +57,15 @@ on boot
 #    setprop ro.build.withbluetooth 0
 #    setprop ro.tether.denied true
     setprop persist.sys.usb.config adb
-    
 #================= BCM
 #wpa_supplicant control socket for android wifi.c
     setprop wifi.interface wlan0
 
-# enable Google-specific location features,
-# like NetworkLocationProvider and LocationCollector
-#    setprop ro.com.google.locationfeatures 1
-
-# create /data and /cache filesystems if necessary
-service disk_preparing /vendor/bin/disk_preparing.sh
-    class ingenic
+# FIXME: cache/data partition setup
+service setup_fs /system/bin/setup_fs data cache
+    class core
+    user root
+    group root
     oneshot
 
 service wpa_supplicant /system/bin/wpa_supplicant \
@@ -134,106 +79,9 @@ service wpa_supplicant /system/bin/wpa_supplicant \
     disabled
     oneshot
 
-service dhcpcd_bnep0 /system/bin/dhcpcd -ABKL
-    class main
-    disabled
-    oneshot
-
-#================= BCM
-# add dhcpcd and wpa_supplicant services for wlan0
-service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
-    disabled
-    oneshot
-
-on property:init.svc.wpa_supplicant=stopped
-    stop dhcpcd
-
-service dhcpcd_eth0 /system/bin/dhcpcd -o domain_name_servers -ABKL
-    disabled
-    oneshot
-#add for 3G support
-
-service pppd_wcdma /system/bin/pppd call wcdmadialer
-    user root
-    group system radio
-    disabled
-    oneshot
-
-service pppd_evdo /system/bin/pppd call evdodialer
-    user root
-    group system radio
-    disabled
-    oneshot
-
-#RDA8851
-service mux /system/bin/gsm0710muxd -s /dev/ttyS1 -n 3 -m basic
-    class main
-    user root
-    group radio cache inet misc
-    oneshot
-
-service ppp0 /system/bin/pppd /dev/ttyM3 unit 0 115200 debug nocrtscts nodetach noauth usepeerdns defaultroute connect-delay 5000
-    user root
-    group radio cache inet misc
-    oneshot
-    disabled
-
-#pppoe
-service pppoe-start /system/bin/pppoe-start
-    disabled
-    oneshot
-
-service pppoe-setup /system/bin/pppoe-setup
-    disabled
-    oneshot
-    
-service pppoe-stop /system/bin/pppoe-stop
-    disabled
-    oneshot
-
-#wifi test
-service wifi_install /system/bin/wifi_install.sh
-    oneshot
-    disabled
-
-service wifi_send1 /system/bin/wifi_send1.sh
-    oneshot
-    disabled
-
-service wifi_send2 /system/bin/wifi_send2.sh
-    oneshot
-    disabled
-
-service wifi_carrier1 /system/bin/wifi_carrier1.sh
-    oneshot
-    disabled
-
-service wifi_carrier2 /system/bin/wifi_carrier2.sh
-    oneshot
-    disabled
-
-service wifi_receive1 /system/bin/wifi_receive1.sh
-    oneshot
-    disabled
-
-service wifi_receive2 /system/bin/wifi_receive2.sh
-    oneshot
-    disabled
-
-service wifi_end /system/bin/wifi_exit.sh
-    oneshot
-    disabled
-
 #  --no-module indicates that it's ok that pvr isn't loaded as a module.
 service pvrsrvctl /vendor/bin/pvrsrvctl --start --no-module
     class core
     user root
     group root
     oneshot
-
-#service dbus /system/bin/dbus-daemon --system --nofork
-#    class main
-#    socket dbus stream 660 bluetooth bluetooth
-#    user bluetooth
-#    group bluetooth net_bt_admin
-

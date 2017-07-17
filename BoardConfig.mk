@@ -39,15 +39,14 @@ TARGET_BOOTLOADER_BOARD_NAME := npm801
 TARGET_AAPT_CHARACTERISTICS := tablet
 PRODUCT_VENDOR_KERNEL_HEADERS := hardware/ingenic/xb4780/kernel-headers
 TARGET_USERIMAGES_USE_EXT4 := true
-ifeq ($(WITH_SDCARD),true)
+ifeq ($(WITH_GMS),true)
   # If you change this number you also need to change the size of
   # partition 2 in sdcardinstaller/mksdcard-ext4.
   # 1835008000 == 1750 * 1024 * 1024
   BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1835008000
 else
-  WITH_SDCARD := false
-  # system size is 640M
-  BOARD_SYSTEMIMAGE_PARTITION_SIZE := 671088640
+  # system size is 1000M
+  BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1048576000
 endif
 # data size is 960M
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 1006632960
@@ -65,8 +64,8 @@ SF_START_GRAPHICS_ALLOCATOR_SERVICE := true
 
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/ingenic/npm801/bluetooth
 
-BOARD_KERNEL_BASE := 0x80000000
-BOARD_KERNEL_CMDLINE := mem=256M@0x0 mem=752M@0x30000000 console=ttyS3,57600n8 ip=off root=/dev/ram0 rw rdinit=/init pmem_camera=16M@0x5f000000
+BOARD_KERNEL_BASE := 0x81F00000
+BOARD_KERNEL_CMDLINE := mem=256M@0x0 mem=768M@0x30000000 console=ttyS3,57600n8 ip=off rw rdinit=/init
 
 #modem configure
 BOARD_MODEM1_MODULE := rda8851cl
@@ -101,7 +100,7 @@ TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 
 ifeq ($(HOST_OS),linux)
   ifeq ($(WITH_DEXPREOPT),)
-    WITH_DEXPREOPT := $(WITH_SDCARD)
+    WITH_DEXPREOPT := true
   endif
 endif
 

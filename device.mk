@@ -124,26 +124,19 @@ PRODUCT_COPY_FILES += \
     vendor/google/apps/GmsCore/lib/armeabi-v7a/libWhisper.so:/system/priv-app/GmsCore/lib/arm/libWhisper.so
 endif
 
-# Wifi
-#BOARD_WLAN_DEVICE_REV := 
-#WIFI_BAND             := 802_11_ABG
-#$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
+# ALSA mixer controls
+PRODUCT_COPY_FILES += \
+       $(LOCAL_PATH)/config/mixer_paths.xml:system/etc/mixer_paths.xml
 
-ifeq ($(WITH_SDCARD),true)
-    NPM801_USE_SDCARD=-sdcard
-else
-    NPM801_USE_SDCARD=
-endif
-
-TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/recovery$(NPM801_USE_SDCARD).fstab
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/config/recovery.fstab
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
     $(LOCAL_PATH)/config/dhcpcd.conf:system/etc/dhcpcd/dhcpcd.conf                            \
-    $(LOCAL_PATH)/config/init$(NPM801_USE_SDCARD).board.rc:root/init.$(TARGET_BOARD_NAME).rc  \
+    $(LOCAL_PATH)/config/init.board.rc:root/init.$(TARGET_BOARD_NAME).rc  \
     $(LOCAL_PATH)/config/init.board.usb.rc:root/init.$(TARGET_BOARD_NAME).usb.rc              \
     $(LOCAL_PATH)/config/init.recovery.board.rc:root/init.recovery.$(TARGET_BOARD_NAME).rc    \
-    $(LOCAL_PATH)/config/fstab$(NPM801_USE_SDCARD).board:root/fstab.$(TARGET_BOARD_NAME)      \
+    $(LOCAL_PATH)/config/fstab.board:root/fstab.$(TARGET_BOARD_NAME)      \
     $(LOCAL_PATH)/config/ueventd.board.rc:root/ueventd.$(TARGET_BOARD_NAME).rc                \
     $(LOCAL_PATH)/config/bt_addr:system/etc/firmware/bcm4330/bt_addr                          \
     $(LOCAL_PATH)/config/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
@@ -166,8 +159,8 @@ PRODUCT_COPY_FILES += \
      $(LOCAL_PATH)/config/apns-conf.xml:system/etc/apns-conf.xml
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/wifi/IW/bcm4330/fw_bcm4330b2.bin:system/lib/wifi/firmware/iw8101/fw_bcmdhd.bin \
-    $(LOCAL_PATH)/wifi/IW/bcm4330/nv_4330b2.txt:system/lib/wifi/firmware/iw8101/nvram_iw8101.txt \
+    $(LOCAL_PATH)/wifi/IW/bcm4330/fw_bcm4330b2.bin:system/etc/firmware/brcm/brcmfmac4330-sdio.bin \
+    $(LOCAL_PATH)/wifi/IW/bcm4330/nv_4330b2.txt:system/etc/firmware/brcm/brcmfmac4330-sdio.txt \
     $(LOCAL_PATH)/wifi/IW/bcm4330/TestRelease_BCM4330_0243.0000_Alltek_AW70_37p4M.hcd:system/etc/firmware/bcm4330/BCM4330.hcd
 
 PRODUCT_COPY_FILES += \
@@ -196,11 +189,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/audio_policy_volumes_drc.xml:system/etc/audio_policy_volumes_drc.xml \
     $(LOCAL_PATH)/config/manifest.xml:system/vendor/manifest.xml \
 
-# logo
-#PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/logo.rle:root/logo.rle                                                    \
-    $(LOCAL_PATH)/bootanimation.zip:system/media/bootanimation.zip
-
 # Key layout file
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/gpio-keys.kl:/system/usr/keylayout/gpio-keys.kl
@@ -209,8 +197,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/akim/libakim.so:/system/vendor/lib/libakim.so \
     $(LOCAL_PATH)/akim/magiccode_prefs.xml:/system/etc/magiccode_prefs.xml
-
-#############################################################################################
 
 PRODUCT_AAPT_CONFIG := normal large ldpi mdpi
 PRODUCT_AAPT_PREF_CONFIG := ldpi

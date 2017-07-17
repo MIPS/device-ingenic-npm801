@@ -1,19 +1,16 @@
-esyscmd(`[ -n "$WITH_SDCARD" -a "$WITH_SDCARD" = "true" ] && echo "define(\`WITH_SDCARD')"')
-/dev/dmmu                              u:object_r:gpu_device:s0
-/dev/fscklogs                          u:object_r:fscklogs:s0
-/dev/ipu0                              u:object_r:gpu_device:s0
-/dev/ipu1                              u:object_r:gpu_device:s0
-/dev/jz-vpu                            u:object_r:video_device:s0
-/dev/ttyS2                             u:object_r:serial_device:s0
-/dev/g_sensor                          u:object_r:gsensor_device:s0
-/dev/pvr_sync                          u:object_r:gpu_device:s0
-/dev/cim                               u:object_r:camera_device:s0
-ifdef(`WITH_SDCARD',/dev/block/mmcblk0p4,/dev/block/nddata)   u:object_r:nddata_block_device:s0
-ifdef(`WITH_SDCARD',/dev/block/mmcblk0p2,/dev/block/ndsystem) u:object_r:ndsystem_block_device:s0
-/dev/block/ndcache                     u:object_r:ndcache_block_device:s0
-/dev/block/ndapanic                    u:object_r:ndapanic_block_device:s0
-/dev/nand_char                         u:object_r:nand_char_device:s0
-/dev/orientation_sensor                u:object_r:orientation_sensor_device:s0
-/system/vendor/bin/disk_preparing.sh   u:object_r:disk_preparing_exec:s0
-/system/vendor/bin/pvrsrvctl           u:object_r:pvrsrvctl_exec:s0
-/system/bin/mke2fs                     u:object_r:mke2fs_exec:s0
+##### file_contexts
+/dev/video0			u:object_r:camera_device:s0
+/dev/dmmu			u:object_r:gpu_device:s0
+/dev/ipu0			u:object_r:gpu_device:s0
+/dev/dri/.+			u:object_r:gpu_device:s0
+/dev/sw_sync			u:object_r:gpu_device:s0
+/dev/jz-vpu			u:object_r:video_device:s0
+/dev/pvr_sync			u:object_r:gpu_device:s0
+/dev/ttyS2			u:object_r:serial_device:s0
+
+/system/vendor/bin/pvrsrvctl	u:object_r:pvrsrvctl_exec:s0
+/system/bin/setup_fs		u:object_r:setup_fs_exec:s0
+
+/dev/block/mmcblk0p2		u:object_r:system_block_device:s0
+/dev/block/mmcblk0p3		u:object_r:cache_block_device:s0
+/dev/block/mmcblk0p4		u:object_r:userdata_block_device:s0

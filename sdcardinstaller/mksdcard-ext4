@@ -80,11 +80,15 @@ which bc >/dev/null || die "No bc in \$PATH"
 # If you change the size of partition two here be sure to change
 # the size of BOARD_SYSTEMIMAGE_PARTITION_SIZE in ../BoardConfig.mk
 # for the case when WITH_SDCARD is true.
-sfdisk_npm801 ${device} 2M,30M 32M,1750M 1782M,256M 2038M,2048M
+if [ "$WITH_GMS" == "true" ]; then
+  sfdisk_npm801 ${device} 2M,30M 32M,1750M 1782M,256M 2038M,2048M
+else
+  sfdisk_npm801 ${device} 2M,30M 32M,1000M 1032M,256M 1288M,2048M
+fi
 
 partitions=("Boot" "System" "Cache" "Data")
 
-for((i=4; i>0; i-=2));
+for((i=4; i>0; i--));
 do
 
   if [ -e "$device$i" ]; then
