@@ -34,7 +34,6 @@ PRODUCT_PACKAGES := \
 
 PRODUCT_PACKAGES += \
     hwcomposer.xb4780    \
-    camera.xb4780        \
     audio.primary.xb4780 \
     audio_policy.default \
     sensors.xb4780       \
@@ -58,8 +57,44 @@ PRODUCT_PACKAGES += \
 # WiFi support
 #
 PRODUCT_PACKAGES += \
+    android.hardware.wifi@1.0-service \
     wpa_supplicant \
-    wpa_supplicant.conf
+    wpa_supplicant.conf \
+    wificond
+
+# Audio HAL
+PRODUCT_PACKAGES += \
+    android.hardware.audio@2.0-impl \
+    android.hardware.audio.effect@2.0-impl
+
+# Bluetooth HAL
+PRODUCT_PACKAGES += \
+    libbt-vendor \
+    android.hardware.bluetooth@1.0-impl
+
+# Gralloc HAL
+PRODUCT_PACKAGES += \
+    android.hardware.graphics.allocator@2.0-impl \
+    android.hardware.graphics.mapper@2.0-impl
+
+# Keymaster HAL
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@3.0-impl
+
+# Light HAL
+PRODUCT_PACKAGES += \
+    android.hardware.sensors@1.0-impl \
+    android.hardware.light@2.0-impl
+
+ # Memtrack HAL
+ PRODUCT_PACKAGES += \
+ android.hardware.memtrack@1.0-impl
+
+# Power HAL
+PRODUCT_PACKAGES += \
+    android.hardware.power@1.0-impl \
+    power.xb4780
+
 
 $(call inherit-product, frameworks/native/build/tablet-7in-hdpi-1024-dalvik-heap.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libGPU/gpu.mk)
@@ -159,6 +194,7 @@ PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/default_volume_tables.xml:system/etc/default_volume_tables.xml \
     $(LOCAL_PATH)/config/audio_policy_configuration.xml:system/etc/audio_policy_configuration.xml \
     $(LOCAL_PATH)/config/audio_policy_volumes_drc.xml:system/etc/audio_policy_volumes_drc.xml \
+    $(LOCAL_PATH)/config/manifest.xml:system/vendor/manifest.xml \
 
 # logo
 #PRODUCT_COPY_FILES += \
