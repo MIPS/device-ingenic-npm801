@@ -23,5 +23,9 @@
     <!-- This device does not allow sms service. -->
     <bool name="config_sms_capable">false</bool>
 
+    <!-- Setting this true forces the headset jack switches to use the/dev/input/event subsystem
+         rather than the uevent framework. -->
+    <bool name="config_useDevInputEventForAudioJack">true</bool>
+
 </resources>
 
