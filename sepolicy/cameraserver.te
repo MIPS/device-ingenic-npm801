@@ -1,4 +1,5 @@
 #============= cameraserver.te ==============
+allow cameraserver system_server:unix_stream_socket { read write };
 
 # sensor manager based camera/video stabilization
 allow cameraserver sensorservice_service:service_manager find;
