@@ -1,0 +1,2 @@
+#============= system_server ==============
+allow system_server gsensor_device:chr_file rw_file_perms;
