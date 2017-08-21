@@ -33,6 +33,9 @@ on post-fs-data
 #set bcm4330 bt mac cfg
     chmod 0770 /data/misc/bluetooth
 
+    chmod 0660 /sys/class/lcd/crd080ti01_40nm01-lcd/lcd_power
+    chown system system /sys/class/lcd/crd080ti01_40nm01-lcd/lcd_power
+
 #change perms of dhcp and wifi socket
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     mkdir /data/misc/wifi/sockets 0777 wifi wifi
