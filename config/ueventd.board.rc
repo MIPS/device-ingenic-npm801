@@ -18,8 +18,9 @@
 #/dev/log/*                0662   root       log
 #/dev/log/events           0666   root       log
 
-#ingenic camea device 
-/dev/cim    0666    root    root
+# Ingenic camea device
+/dev/video0                0666    root      root
+/dev/video1                0666    root      root
 
 # for ingenic vpu or tcsm
 /dev/tcsm		  0666    root    root
