@@ -73,8 +73,8 @@ init_core()
   # Check for md5sum
   [ -z `which md5sum 2>&1` ] && die "No 'md5sum' present"
 
-  # Check for mkfs.ext4
-  [ -z `which mkfs.ext4 2>&1` ] && die "No 'mkfs.ext4' present"
+  # Check for mkfs.f2fs
+  [ -z `which mkfs.f2fs 2>&1` ] && die "No 'mkfs.f2fs' present"
 
   # Check if $OUT is defined
   [ -z $OUT ] && die '$OUT is not defined'
@@ -138,9 +138,11 @@ configure_sd_card_partitions()
 
     if [ $i -eq 1 ]; then
       readonly partSystem=${part}
+    else
+      # Partitions 2 and 3 will be set up as f2fs
+      # mkfs.f2fs command requires f2fs-tools package
+      sudo mkfs.f2fs -l "${partitions[$i-1]}" ${device}${part}
     fi
-
-    sudo mkfs.ext4 -L "${partitions[$i-1]}" ${device}${part}
   done
 }
 

@@ -30,6 +30,8 @@ PRODUCT_PACKAGES := \
     mke2fs_host     \
     e2fsck          \
     e2fsck_host     \
+    mkfs.f2fs       \
+    fsck.f2fs       \
     nand_flash_image
 
 PRODUCT_PACKAGES += \

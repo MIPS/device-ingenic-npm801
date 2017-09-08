@@ -39,6 +39,7 @@ TARGET_BOOTLOADER_BOARD_NAME := npm801
 TARGET_AAPT_CHARACTERISTICS := tablet
 PRODUCT_VENDOR_KERNEL_HEADERS := hardware/ingenic/xb4780/kernel-headers
 TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
 ifeq ($(WITH_GMS),true)
   # If you change this number you also need to change the size of
   # partition 2 in sdcardinstaller/mksdcard-ext4.
