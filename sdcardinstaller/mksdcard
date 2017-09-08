@@ -1,0 +1,178 @@
+#!/bin/bash
+#
+# Copyright (c) 2013,2014,2016,2017 Imagination Technologies
+# Original-Author: Chris Larsen <chris.larsen@imgtec.com>
+#
+# Writes Android filesystems to the sd card for Ingenic tablet (NPM801).
+# Derived from the CI20 versions of mksdcard and mksdcard-ext scripts.
+#
+# Usage:
+#   ./mksdcard-ext4 /dev/sdX
+#
+
+set -e
+
+cleanup()
+{
+  echo "Cleaning up..."
+  [ "${finished}" = "true" ] && sudo eject ${device} && echo "Cleanup completed; it is safe to remove your card"
+  trap - EXIT INT TERM
+}
+trap cleanup EXIT INT TERM
+
+die()
+{
+  echo "$@" >&2
+  exit 1
+}
+
+sfdisk_npm801()
+{
+  local sfdisk_tool=`which sfdisk`
+  local blockdev_tool=`which blockdev`
+  local partprobe_tool=`which partprobe`
+
+  [ -f "$sfdisk_tool" ] || die "No sfdisk in \$PATH"
+  [ -f "$blockdev_tool" ] || die "No blockdev in \$PATH"
+  [ -f "$partprobe_tool" ] || die "No partprobe in \$PATH"
+  [ -b "$1" ] || die "Device '$1' not found"
+
+  sfdisk_version=`$sfdisk_tool --version | sed 's,.*2\.\([0-9]*\)\.[0-9]*,\1,'`
+
+  unset sfdisk_is_ancient
+  test $sfdisk_version -lt 26 && sfdisk_is_ancient=1
+
+  sfdisk_dev="$1"
+  shift
+
+  sfdisk_parts=`echo $* | tr ' ' '\n'`
+
+  set +e
+  if [ $sfdisk_is_ancient ]; then
+      echo "$sfdisk_parts" | tr -d M | sudo $sfdisk_tool -L -uM "$sfdisk_dev"
+  else
+      echo "$sfdisk_parts" | sudo $sfdisk_tool "$sfdisk_dev"
+  fi
+  set -e
+
+  sudo $blockdev_tool --rereadpt $sfdisk_dev
+  sudo $partprobe_tool $sfdisk_dev
+  sleep 2
+}
+
+init_core()
+{
+  readonly device="$1"
+
+  # Check device
+  [ -e "${device}" ] || die "Device '${device}' not found"
+
+  # Check for awk
+  [ -z `which awk 2>&1` ] && die "No 'awk' present"
+
+  # Check for md5sum
+  [ -z `which md5sum 2>&1` ] && die "No 'md5sum' present"
+
+  # Check for mkfs.ext4
+  [ -z `which mkfs.ext4 2>&1` ] && die "No 'mkfs.ext4' present"
+
+  # Check if $OUT is defined
+  [ -z $OUT ] && die '$OUT is not defined'
+
+  # Check for stat
+  [ -z `which stat 2>&1` ] && die "No 'stat' present"
+
+  # Check for umount
+  [ -z `which umount 2>&1` ] && die "No 'umount' present"
+
+  # Check for Android system image
+  readonly systemImg=${SYSTEMIMG:-${OUT}/system.img}
+  [ -e "${systemImg}" ] || die "Android system image '${systemImg}' not found"
+
+  set +e
+  # Unmount the SD card
+  echo "Unmounting $1*"
+  `sudo umount $1*`
+  set -e
+
+  grep ${device} /etc/mtab >/dev/null && \
+  die "Device '${device}' contains mounted partitions"
+
+  return 0
+}
+
+init_partition_layout_constants()
+{
+  partitions=("system" "cache" "data")
+  readonly partNum=${#partitions[@]}
+
+  # Partition sizes and offsets represent size in MB
+  readonly cachePartSize=256
+  readonly dataPartSize=2048
+
+  local systemImgSize=`stat -c %s ${systemImg}`
+  local megabyte=$((1024 * 1024))
+  local systemPartSize=$((${systemImgSize} / megabyte))
+
+  readonly systemPartOffset="2"
+  readonly cachePartOffset=$((${systemPartOffset} + ${systemPartSize}))
+  readonly dataPartOffset=$((${cachePartOffset} + ${cachePartSize}))
+
+  local tmpPartitionLayout="${systemPartOffset}M,${systemPartSize}M"
+  tmpPartitionLayout="${tmpPartitionLayout} ${cachePartOffset}M,${cachePartSize}M"
+  tmpPartitionLayout="${tmpPartitionLayout} ${dataPartOffset}M,${dataPartSize}M"
+  readonly partitionLayout=${tmpPartitionLayout}
+}
+
+configure_sd_card_partitions()
+{
+  sfdisk_npm801 ${device} ${partitionLayout}
+
+  for((i=${partNum}; i>0; i--));
+  do
+    if [ -e "$device$i" ]; then
+      part=${i}
+    elif [ -e "${device}p$" ]; then
+      part="p${i}"
+    fi
+
+    if [ $i -eq 1 ]; then
+      readonly partSystem=${part}
+    fi
+
+    sudo mkfs.ext4 -L "${partitions[$i-1]}" ${device}${part}
+  done
+}
+
+burn_system_image()
+{
+  echo -e "\nPlease wait, writing system.img"
+  sudo dd if=${systemImg} of=${device}${partSystem}
+}
+
+verify_burned_segment()
+{
+  originalChecksum=`md5sum $1 | awk '{print $1}'`
+  copiedChecksum=`sudo md5sum $2 | awk '{print $1}'`
+  if [ "$originalChecksum" != "$copiedChecksum" ]; then
+    die "Burned data mismatch. $1 md5sum does not match md5sum of $2"
+  fi
+}
+
+verify_burned_sd_card()
+{
+  sync
+  verify_burned_segment ${systemImg} ${device}${partSystem}
+
+  echo "Successfully verified SD card content"
+}
+
+init_core $1
+init_partition_layout_constants
+configure_sd_card_partitions
+burn_system_image
+
+verify_burned_sd_card
+finished=true
+echo
+echo "Finished, wait for clean up before removing your card!"
