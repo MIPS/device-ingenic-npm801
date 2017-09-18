@@ -16,3 +16,5 @@
 /dev/block/mmcblk0p4		u:object_r:userdata_block_device:s0
 
 /dev/g_sensor			u:object_r:gsensor_device:s0
+
+/dev/block/zram0		u:object_r:swap_block_device:s0
