@@ -103,8 +103,6 @@ PRODUCT_PACKAGES += \
     android.hardware.power@1.0-impl \
     power.xb4780
 
-
-$(call inherit-product, frameworks/native/build/tablet-7in-hdpi-1024-dalvik-heap.mk)
 $(call inherit-product, hardware/ingenic/xb4780/libGPU/gpu.mk)
 
 # Copy H263/MPEG4 Firmware (mpeg4_p1.bin) to /system/etc

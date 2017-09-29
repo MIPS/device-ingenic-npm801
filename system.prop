@@ -1,2 +1,8 @@
 rild.libpath=/system/lib/libreference-ril.so
 rild.libargs=-d /dev/ttyM1
+dalvik.vm.heapstartsize=5m
+dalvik.vm.heapgrowthlimit=80m
+dalvik.vm.heapsize=256m
+dalvik.vm.heaptargetutilization=0.75
+dalvik.vm.heapminfree=512k
+dalvik.vm.heapmaxfree=2m
