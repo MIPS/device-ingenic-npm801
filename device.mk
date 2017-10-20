@@ -251,3 +251,5 @@ PRODUCT_PROPERTY_OVERRIDES +=    \
 #PRODUCT_PROPERTY_OVERRIDES += \
         net.dns1=8.8.8.8 \
         net.dns2=8.8.4.4
+
+ PRODUCT_PACKAGES += Launcher3
