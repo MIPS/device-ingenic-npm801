@@ -15,6 +15,7 @@ set -e
 cleanup()
 {
   echo "Cleaning up..."
+  [ -z "${sdMount}" ] || sudo umount ${sdMount}
   [ "${finished}" = "true" ] && sudo eject ${device} && echo "Cleanup completed; it is safe to remove your card"
   trap - EXIT INT TERM
 }
@@ -73,6 +74,9 @@ init_core()
   # Check for md5sum
   [ -z `which md5sum 2>&1` ] && die "No 'md5sum' present"
 
+  # Check for mkfs.ext4
+  [ -z `which mkfs.ext4 2>&1` ] && die "No 'mkfs.ext4' present"
+
   # Check for mkfs.f2fs
   [ -z `which mkfs.f2fs 2>&1` ] && die "No 'mkfs.f2fs' present"
 
@@ -85,7 +89,11 @@ init_core()
   # Check for umount
   [ -z `which umount 2>&1` ] && die "No 'umount' present"
 
-  # Check for Android system image
+  # Check for Android images
+  readonly bootImg=${BOOTIMG:-${OUT}/boot.img}
+  [ -e "${bootImg}" ] || die "Android boot image '${bootImg}' not found"
+  readonly recoveryImg=${RECOVERYIMG:-${OUT}/recovery.img}
+  [ -e "${recoveryImg}" ] || die "Android recovery image '${recoveryImg}' not found"
   readonly systemImg=${SYSTEMIMG:-${OUT}/system.img}
   [ -e "${systemImg}" ] || die "Android system image '${systemImg}' not found"
 
@@ -103,10 +111,11 @@ init_core()
 
 init_partition_layout_constants()
 {
-  partitions=("system" "cache" "data")
+  partitions=("boot" "system" "cache" "data")
   readonly partNum=${#partitions[@]}
 
   # Partition sizes and offsets represent size in MB
+  readonly bootPartSize=30
   readonly cachePartSize=256
   readonly dataPartSize=2048
 
@@ -114,11 +123,14 @@ init_partition_layout_constants()
   local megabyte=$((1024 * 1024))
   local systemPartSize=$((${systemImgSize} / megabyte))
 
-  readonly systemPartOffset="2"
+  # 2M is skipped and used for storing U-Boot outside the visible partition layout
+  readonly bootPartOffset="2"
+  readonly systemPartOffset=$((${bootPartOffset} + ${bootPartSize}))
   readonly cachePartOffset=$((${systemPartOffset} + ${systemPartSize}))
   readonly dataPartOffset=$((${cachePartOffset} + ${cachePartSize}))
 
-  local tmpPartitionLayout="${systemPartOffset}M,${systemPartSize}M"
+  local tmpPartitionLayout="${bootPartOffset}M,${bootPartSize}M"
+  tmpPartitionLayout="${tmpPartitionLayout} ${systemPartOffset}M,${systemPartSize}M"
   tmpPartitionLayout="${tmpPartitionLayout} ${cachePartOffset}M,${cachePartSize}M"
   tmpPartitionLayout="${tmpPartitionLayout} ${dataPartOffset}M,${dataPartSize}M"
   readonly partitionLayout=${tmpPartitionLayout}
@@ -136,18 +148,36 @@ configure_sd_card_partitions()
       part="p${i}"
     fi
 
-    if [ $i -eq 1 ]; then
+    if [ $i -eq 2 ]; then
       readonly partSystem=${part}
+    fi
+
+    if [ $i -le 2 ]; then
+      # Partitions 1 and 2 will be set up as ext4
+      sudo mkfs.ext4 -L "${partitions[$i-1]}" ${device}${part}
     else
-      # Partitions 2 and 3 will be set up as f2fs
-      # mkfs.f2fs command requires f2fs-tools package
+      # Partitions 3 and 4 will be set up as f2fs
       sudo mkfs.f2fs -l "${partitions[$i-1]}" ${device}${part}
     fi
   done
+
+  # sdMount is not initialized in init_constants()
+  # the way it is used in the cleanup() function
+  readonly sdMount=${tmpDir}/sd_mount
+  mkdir ${sdMount}
+  # mount ext4 partition
+  sudo mount ${device}${part} ${sdMount}
+  sudo chmod a+w ${sdMount}
 }
 
-burn_system_image()
+burn_android_images()
 {
+  # copy Android boot image
+  sudo cp -v ${bootImg} ${sdMount}/
+
+  # copy Android recovery image
+  sudo cp -v ${recoveryImg} ${sdMount}/
+
   echo -e "\nPlease wait, writing system.img"
   sudo dd if=${systemImg} of=${device}${partSystem}
 }
@@ -164,6 +194,9 @@ verify_burned_segment()
 verify_burned_sd_card()
 {
   sync
+
+  verify_burned_segment ${bootImg} ${sdMount}/boot.img
+  verify_burned_segment ${recoveryImg} ${sdMount}/recovery.img
   verify_burned_segment ${systemImg} ${device}${partSystem}
 
   echo "Successfully verified SD card content"
@@ -172,7 +205,7 @@ verify_burned_sd_card()
 init_core $1
 init_partition_layout_constants
 configure_sd_card_partitions
-burn_system_image
+burn_android_images
 
 verify_burned_sd_card
 finished=true

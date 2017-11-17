@@ -3,7 +3,7 @@
 # The filesystem that contains the filesystem checker binary (typically /system) cannot
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 
-/dev/block/mmcblk0p1            /system             ext4      ro                                                 wait
-/dev/block/mmcblk0p2            /cache              f2fs      defaults                                           wait,check
-/dev/block/mmcblk0p3            /data               f2fs      defaults,nosuid,nodev                              wait,check
+/dev/block/mmcblk0p2            /system             ext4      ro                                                 wait
+/dev/block/mmcblk0p3            /cache              f2fs      defaults                                           wait,check
+/dev/block/mmcblk0p4            /data               f2fs      defaults,nosuid,nodev                              wait,check
 /dev/block/zram0                none                swap      defaults                                           zramsize=268435456,notrim
