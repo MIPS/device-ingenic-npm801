@@ -16,6 +16,8 @@ cleanup()
 {
   echo "Cleaning up..."
   [ -z "${sdMount}" ] || sudo umount ${sdMount}
+  rm -rf ${tmpDir}
+  rm -rf ${verifyDir}
   [ "${finished}" = "true" ] && sudo eject ${device} && echo "Cleanup completed; it is safe to remove your card"
   trap - EXIT INT TERM
 }
@@ -63,8 +65,14 @@ sfdisk_npm801()
 
 init_core()
 {
-  readonly device="$1"
+  readonly tmpDir=`mktemp -d`
+  readonly verifyDir=`mktemp -d`
+  readonly ubootPrebuiltDir="$ANDROID_BUILD_TOP/device/ingenic/npm801/u-boot"
+  #check for U-Boot prebuilt dir
+  [ ! -z "${ANDROID_BUILD_TOP}" ] || die "ANDROID_BUILD_TOP has not been initialized"
+  [ -e "${ubootPrebuiltDir}" ] || die "U-Boot prebuilt directory '${ubootPrebuiltDir}' does not exist"
 
+  readonly device="$1"
   # Check device
   [ -e "${device}" ] || die "Device '${device}' not found"
 
@@ -136,6 +144,18 @@ init_partition_layout_constants()
   readonly partitionLayout=${tmpPartitionLayout}
 }
 
+init_uboot_constants()
+{
+  readonly bs_uBootImg=1024
+  readonly seek_uBootImg=14
+}
+
+init_constants()
+{
+  init_uboot_constants
+  init_partition_layout_constants
+}
+
 configure_sd_card_partitions()
 {
   sfdisk_npm801 ${device} ${partitionLayout}
@@ -170,6 +190,13 @@ configure_sd_card_partitions()
   sudo chmod a+w ${sdMount}
 }
 
+burn_uboot()
+{
+  # install MMC u-boot
+  # SPL is located on NAND
+  sudo dd if=${ubootPrebuiltDir}/u-boot.img of=${device} obs=${bs_uBootImg} seek=${seek_uBootImg}
+}
+
 burn_android_images()
 {
   # copy Android boot image
@@ -195,6 +222,12 @@ verify_burned_sd_card()
 {
   sync
 
+  local bs_verify=1
+  local ubootImageSize=$(stat -c%s ${ubootPrebuiltDir}/u-boot.img)
+  local skip_uBootImg=$((${bs_uBootImg} * ${seek_uBootImg}))
+  sudo dd if=${device} of=${verifyDir}/u-boot.img bs=${bs_verify} skip=${skip_uBootImg} count=${ubootImageSize}
+  verify_burned_segment ${ubootPrebuiltDir}/u-boot.img ${verifyDir}/u-boot.img
+
   verify_burned_segment ${bootImg} ${sdMount}/boot.img
   verify_burned_segment ${recoveryImg} ${sdMount}/recovery.img
   verify_burned_segment ${systemImg} ${device}${partSystem}
@@ -203,9 +236,12 @@ verify_burned_sd_card()
 }
 
 init_core $1
-init_partition_layout_constants
+init_constants
+
 configure_sd_card_partitions
+
 burn_android_images
+burn_uboot
 
 verify_burned_sd_card
 finished=true
