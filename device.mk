@@ -147,9 +147,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/bt_addr:system/etc/firmware/bcm4330/bt_addr                          \
     $(LOCAL_PATH)/config/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/config/disk_preparing.sh:system/vendor/bin/disk_preparing.sh
-
 # Media Codecs List
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/config/media_profiles.xml:system/etc/media_profiles.xml \
@@ -194,7 +191,7 @@ PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/default_volume_tables.xml:system/etc/default_volume_tables.xml \
     $(LOCAL_PATH)/config/audio_policy_configuration.xml:system/etc/audio_policy_configuration.xml \
     $(LOCAL_PATH)/config/audio_policy_volumes_drc.xml:system/etc/audio_policy_volumes_drc.xml \
-    $(LOCAL_PATH)/config/manifest.xml:system/vendor/manifest.xml \
+    $(LOCAL_PATH)/config/manifest.xml:/vendor/manifest.xml \
 
 # Key layout file
 PRODUCT_COPY_FILES += \
@@ -202,8 +199,8 @@ PRODUCT_COPY_FILES += \
 
 # Magiccode libakim
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/akim/libakim.so:/system/vendor/lib/libakim.so \
-    $(LOCAL_PATH)/akim/magiccode_prefs.xml:/system/etc/magiccode_prefs.xml
+    $(LOCAL_PATH)/akim/libakim.so:/vendor/lib/libakim.so \
+    $(LOCAL_PATH)/akim/magiccode_prefs.xml:/vendor/etc/magiccode_prefs.xml
 
 PRODUCT_AAPT_CONFIG := normal large ldpi mdpi
 PRODUCT_AAPT_PREF_CONFIG := ldpi

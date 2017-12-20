@@ -59,7 +59,7 @@ sfdisk_npm801()
   set -e
 
   sudo $blockdev_tool --rereadpt $sfdisk_dev
-  sudo $partprobe_tool $sfdisk_dev
+  sudo $partprobe_tool -d $sfdisk_dev
   sleep 2
 }
 
@@ -104,6 +104,11 @@ init_core()
   [ -e "${recoveryImg}" ] || die "Android recovery image '${recoveryImg}' not found"
   readonly systemImg=${SYSTEMIMG:-${OUT}/system.img}
   [ -e "${systemImg}" ] || die "Android system image '${systemImg}' not found"
+  readonly vendorImg=${VENDORIMG:=${OUT}/vendor.img}
+  [ -e "${vendorImg}" ] || die "Android vendor image '${vendorImg}' not found"
+
+  readonly dtb=$ANDROID_BUILD_TOP/device/ingenic/npm801/dtb/npm801-sdcard.dtb
+  [ -e "${dtb}" ] || die "Kernel device tree blob '${dtb}' not found"
 
   set +e
   # Unmount the SD card
@@ -119,28 +124,36 @@ init_core()
 
 init_partition_layout_constants()
 {
-  partitions=("boot" "system" "cache" "data")
+  partitions=("boot" "system" "vendor" "extended" "cache" "userdata")
   readonly partNum=${#partitions[@]}
 
   # Partition sizes and offsets represent size in MB
-  readonly bootPartSize=30
-  readonly cachePartSize=256
-  readonly dataPartSize=2048
+  local bootPartSize=30
+  local cachePartSize=256
+  local dataPartSize=2048
+  local vendorPartSize=64
+  local extendedPartPadding=1
 
   local systemImgSize=`stat -c %s ${systemImg}`
   local megabyte=$((1024 * 1024))
   local systemPartSize=$((${systemImgSize} / megabyte))
 
-  # 2M is skipped and used for storing U-Boot outside the visible partition layout
-  readonly bootPartOffset="2"
-  readonly systemPartOffset=$((${bootPartOffset} + ${bootPartSize}))
-  readonly cachePartOffset=$((${systemPartOffset} + ${systemPartSize}))
-  readonly dataPartOffset=$((${cachePartOffset} + ${cachePartSize}))
+  local extPartSize=$((2 * ${extendedPartPadding} + ${cachePartSize} + ${dataPartSize}))
 
-  local tmpPartitionLayout="${bootPartOffset}M,${bootPartSize}M"
-  tmpPartitionLayout="${tmpPartitionLayout} ${systemPartOffset}M,${systemPartSize}M"
-  tmpPartitionLayout="${tmpPartitionLayout} ${cachePartOffset}M,${cachePartSize}M"
-  tmpPartitionLayout="${tmpPartitionLayout} ${dataPartOffset}M,${dataPartSize}M"
+  # 2M is skipped and used for storing U-Boot outside the visible partition layout
+  local bootPartOffset="2"
+  local systemPartOffset=$((${bootPartOffset} + ${bootPartSize}))
+  local vendorPartOffset=$((${systemPartOffset} + ${systemPartSize}))
+  local extPartOffset=$((${vendorPartOffset} + ${vendorPartSize}))
+  local cachePartOffset=$((${extPartOffset} + ${extendedPartPadding}))
+  local dataPartOffset=$((${cachePartOffset} + ${cachePartSize} + ${extendedPartPadding}))
+
+  local tmpPartitionLayout="${bootPartOffset}M,${bootPartSize}M,83"
+  tmpPartitionLayout="${tmpPartitionLayout} ${systemPartOffset}M,${systemPartSize}M,83"
+  tmpPartitionLayout="${tmpPartitionLayout} ${vendorPartOffset}M,${vendorPartSize}M,83"
+  tmpPartitionLayout="${tmpPartitionLayout} ${extPartOffset}M,${extPartSize}M,5"
+  tmpPartitionLayout="${tmpPartitionLayout} ${cachePartOffset}M,${cachePartSize}M,83"
+  tmpPartitionLayout="${tmpPartitionLayout} ${dataPartOffset}M,${dataPartSize}M,83"
   readonly partitionLayout=${tmpPartitionLayout}
 }
 
@@ -160,25 +173,28 @@ configure_sd_card_partitions()
 {
   sfdisk_npm801 ${device} ${partitionLayout}
 
-  for((i=${partNum}; i>0; i--));
+  for((i=1; i<=${partNum}; i++));
   do
-    if [ -e "$device$i" ]; then
-      part=${i}
-    elif [ -e "${device}p$" ]; then
-      part="p${i}"
-    fi
-
-    if [ $i -eq 2 ]; then
-      readonly partSystem=${part}
-    fi
-
-    if [ $i -le 2 ]; then
-      # Partitions 1 and 2 will be set up as ext4
-      sudo mkfs.ext4 -L "${partitions[$i-1]}" ${device}${part}
-    else
-      # Partitions 3 and 4 will be set up as f2fs
-      sudo mkfs.f2fs -l "${partitions[$i-1]}" ${device}${part}
-    fi
+    case ${partitions[$i-1]} in
+    "boot")
+      readonly partBoot="${device}${i}"
+      sudo mkfs.ext4 -L "${partitions[$i-1]}" ${partBoot}
+      ;;
+    "system")
+      readonly partSystem="${device}${i}"
+      ;;
+    "vendor")
+      readonly partVendor="${device}${i}"
+      ;;
+    "cache")
+      readonly partCache="${device}${i}"
+      sudo mkfs.f2fs -l "${partitions[$i-1]}" ${partCache}
+      ;;
+    "userdata")
+      readonly partUserdata="${device}${i}"
+      sudo mkfs.f2fs -l "${partitions[$i-1]}" ${partUserdata}
+      ;;
+    esac
   done
 
   # sdMount is not initialized in init_constants()
@@ -186,7 +202,7 @@ configure_sd_card_partitions()
   readonly sdMount=${tmpDir}/sd_mount
   mkdir ${sdMount}
   # mount ext4 partition
-  sudo mount ${device}${part} ${sdMount}
+  sudo mount ${partBoot} ${sdMount}
   sudo chmod a+w ${sdMount}
 }
 
@@ -206,7 +222,13 @@ burn_android_images()
   sudo cp -v ${recoveryImg} ${sdMount}/
 
   echo -e "\nPlease wait, writing system.img"
-  sudo dd if=${systemImg} of=${device}${partSystem}
+  sudo dd if=${systemImg} of=${partSystem}
+
+  echo -e "\nPlease wait, writing vendor.img"
+  sudo dd if=${vendorImg} of=${partVendor}
+
+  # copy kernel device tree blob
+  sudo cp -v ${dtb} ${sdMount}/jz4780.dtb
 }
 
 verify_burned_segment()
@@ -230,7 +252,9 @@ verify_burned_sd_card()
 
   verify_burned_segment ${bootImg} ${sdMount}/boot.img
   verify_burned_segment ${recoveryImg} ${sdMount}/recovery.img
-  verify_burned_segment ${systemImg} ${device}${partSystem}
+  verify_burned_segment ${systemImg} ${partSystem}
+  verify_burned_segment ${vendorImg} ${partVendor}
+  verify_burned_segment ${dtb} ${sdMount}/jz4780.dtb
 
   echo "Successfully verified SD card content"
 }
