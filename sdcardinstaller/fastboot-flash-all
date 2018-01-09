@@ -36,6 +36,8 @@ check_environment()
 	# Check if $OUT is defined
 	[ -z $OUT ] && die '$OUT is not defined'
 
+	# Check if $ANDROID_BUILD_TOP is defined
+	[ -z $ANDROID_BUILD_TOP ] && die '$ANDROID_BUILD_TOP is not defined'
 
 	# Check if boot.img exists
 	[ ! -f "$OUT/boot.img" ] && die "Android boot image '$OUT/boot.img' not found"
@@ -51,6 +53,10 @@ check_environment()
 
 	# Check if userdata.img exists
 	[ ! -f "$OUT/userdata.img" ] && die "Android userdata image '$OUT/userdata.img' not found"
+
+	# Check if device tree blob exists
+	dtb="$ANDROID_BUILD_TOP/device/ingenic/npm801/dtb/npm801-sdcard.dtb"
+	[ ! -f "$dtb" ] && die "'$dtb' not found"
 }
 
 perform_calculations()
@@ -111,6 +117,7 @@ flash_all_ext4_f2fs()
 {
 	fastboot $device_id_option flash cache
 	fastboot $device_id_option flash userdata
+	fastboot $device_id_option flash dtb $dtb
 	fastboot $device_id_option flashall
 }
 
