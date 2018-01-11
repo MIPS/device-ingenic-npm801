@@ -1,13 +1,3 @@
-*** WARNING ** WARNING ** WARNING ** WARNING ** WARNING ** WARNING ***
-**                                                                  **
-** When switching from the full_npm801 target to aosp_npm801 it is  **
-** imperative that the bootloader is updated. Failure to do so will **
-** to mysterious erros and crashes.                                 **
-**                                                                  **
-**      !! Updating xboot will erase all data on the device !!      **
-**                                                                  **
-*** WARNING ** WARNING ** WARNING ** WARNING ** WARNING ** WARNING ***
-
 
 Building Android
 ================
@@ -18,39 +8,18 @@ Building Android
 2. Choose target:
     $ lunch aosp_npm801-userdebug
 
-3. Starting with Nougat decide whether you want to install Android
-   into the tablet's NAND only, or to place the /system & /data
-   file systems in SD card.
-
-   a. To select installing Android using both NAND, and SD card use
-
-              export WITH_SDCARD=true
-
-   b. To install only into NAND you'll need to make sure that
-      WITH_SDCARD is undefined (unset WITH_SDCARD), or set to "false"
-      (export WITH_SDCARD=false).
-
-   [Note: By default if WITH_SDCARD is true, then WITH_DEXPREOPT is
-   also true. Otherwise, the default value of WITH_DEXPREOPT is false.
-   If you're building for installation in NAND only, (since Nougat)
-   there isn't enough space to use the WITH_DEXPREOPT option so it's
-   unlikely that in this case you would want to override the default
-   value of WITH_DEXPREOPT.]
-
-4. Build everything.
+3. Build everything.
     $ make -j24
 
-Installing bootloader (xboot)
+Installing bootloader (U-Boot)
 =============================
 
-You will need to install xboot if the device does not have a fastboot
-capable bootloader installed or the xboot version has changed. it is
-*REQUIRED* to update xboot when switching from a full_npm801 build to
-aosp_npm801.
+You will need to install U-Boot SPL if the device does not have a fastboot
+capable bootloader installed or the U-Boot SPL version has changed.
 
 1. Connect the device to PC by USB cable and plug charger into the device.
 
-2. Put device into USB-BOOT mode by pressing both Vol+ and reset at
+2. Put device into USB-Boot mode by pressing both Vol+ and reset at
    the same time. Keep Vol+ pressed for approximately 2 seconds. Note
    that the screen will remain blank in this mode.
 
@@ -58,64 +27,50 @@ aosp_npm801.
    'lsusb'. The device should show up as:
        Bus ??? Device ???: ID a108:4780
 
-5. Update xboot:
-   $ cd $TOP/device/ingenic/npm801/ingenic-xboot-updater
-   $ sudo ./ingenic-xboot-updater --boot=x-boot-nand.bin
+5. Update U-Boot SPL:
+   $ cd $TOP/device/ingenic/npm801/sdcardinstaller/u-boot
+   $ ./update-bootloader.sh
 
 
 Flashing Android to device
 ==========================
 
-These instructions assume that you're only installing Android into NAND.
-That is, you're not using SD card to house the /system, and /data file
-systems. If you're using SD card skip to the next section.
+U-Boot SPL is the only component installed into NAND. All other components
+will be located on the SD card.
+This procedure is only usable when you already have a functional Android running
+on the tablet and the latest U-Boot version. Additionally, if partition sizes
+on the tablet's SD card do not match sizes of the partitions that you want to
+flash, then you will also have to use "Flashing Android to SD card" procedure.
 
 1. Connect the device to PC by USB cable and plug charger into the device.
 
-2. Press 'return' and do a reset; keep 'return' key pressed until
-   fastboot screen appears.
+2. Run the script for flashing Android to the device
+    $ cd $TOP/device/ingenic/npm801/sdcardinstaller
+    $ ./fastboot-flash-all
 
-3. The USB icon in the center of screen will show if you have a proper
-   USB connection.
+The fastboot process takes approximately 6 minutes.
 
-3. Run fastboot on host. You can run fastboot as a normal user if your udev rules
-   include the tablet device ID. Otherwise, otherwise you need to run fastboot as root:
-   $ sudo -s
-   # cd $TOP
-   # fastboot flashall
-
-The fastboot process takes approximately 15 minutes.
-
-Flashing Android to SD card, and to NAND
+Flashing Android to SD card
 ========================================
 
+This procedure is usable in all cases.
+Please make sure that you have the latest U-Boot version before
+going further.
+
 1. Install SD card into reader. Make note of which Linux device represents
-   the SD card. On my system it's /dev/sde. You'll need the adjust the
+   the SD card. On my system it's /dev/sde. You'll need to adjust the
    instructions in this section to match the SD card device on your system.
 
-2. cd $TOP/device/ingenic/npm801/sdcardinstaller
+2. $ cd $TOP/device/ingenic/npm801/sdcardinstaller
 
-3. sudo umount /dev/sde*
-
-4. sudo dd if=/dev/zero of=/dev/sde bs=512 count=1
+3. $ sudo dd if=/dev/zero of=/dev/sdX bs=512 count=1
 
    This step may not be needed. Typically, it's needed only if the SD
    card was previously formatted for use as VFAT device. In any case,
    running this extra step doesn't hurt anything.
 
-5. ./mksdcard-ext4 /dev/sde
+4. $ ./mksdcard /dev/sdX
 
-   This step partitions the SD card into 4 partitions but only uses
-   partitions 2, and 4.
+5. Install SD card into tablet.
 
-6. Install SD card into tablet.
-
-7. Reflash the NAND.
-
-   a. sudo fastboot flash boot
-
-   b. sudo fastboot flash recovery
-
-   c. sudo fastboot reboot
-
-   The tablet will reset, and then boot into Android.
+6. Press the reset button
