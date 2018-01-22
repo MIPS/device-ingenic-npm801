@@ -25,6 +25,8 @@ endif
 PRODUCT_COPY_FILES := \
     $(LOCAL_KERNEL):kernel
 
+PRODUCT_FULL_TREBLE_OVERRIDE := true
+
 PRODUCT_PACKAGES := \
     mke2fs          \
     mke2fs_host     \
@@ -64,44 +66,67 @@ PRODUCT_PACKAGES += \
     wpa_supplicant.conf \
     wificond
 
+PRODUCT_PACKAGES += \
+    android.hardware.configstore@1.0-service
+
 # Audio HAL
 PRODUCT_PACKAGES += \
     android.hardware.audio@2.0-impl \
-    android.hardware.audio.effect@2.0-impl
+    android.hardware.audio.effect@2.0-impl \
+    android.hardware.audio@2.0-service \
+    android.hardware.soundtrigger@2.0-impl
 
 # Bluetooth HAL
 PRODUCT_PACKAGES += \
     libbt-vendor \
-    android.hardware.bluetooth@1.0-impl
+    android.hardware.bluetooth@1.0-impl \
+    android.hardware.bluetooth@1.0-service
 
 # Camera HAL
 PRODUCT_PACKAGES += \
     camera.xb4780        \
-    android.hardware.camera.provider@2.4-impl
+    android.hardware.camera.provider@2.4-impl \
+    android.hardware.camera.provider@2.4-service
 
 # Gralloc HAL
 PRODUCT_PACKAGES += \
     android.hardware.graphics.allocator@2.0-impl \
+    android.hardware.graphics.allocator@2.0-service \
     android.hardware.graphics.mapper@2.0-impl
 
 # Keymaster HAL
 PRODUCT_PACKAGES += \
-    android.hardware.keymaster@3.0-impl
+    android.hardware.keymaster@3.0-impl \
+    android.hardware.keymaster@3.0-service
 
 # Light HAL
 PRODUCT_PACKAGES += \
     lights.npm801 \
+    android.hardware.light@2.0-impl \
+    android.hardware.light@2.0-service
+
+# Sensors HAL
+PRODUCT_PACKAGES += \
     android.hardware.sensors@1.0-impl \
-    android.hardware.light@2.0-impl
+    android.hardware.sensors@1.0-service
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/config/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
 
  # Memtrack HAL
  PRODUCT_PACKAGES += \
- android.hardware.memtrack@1.0-impl
+ android.hardware.memtrack@1.0-impl \
+ android.hardware.memtrack@1.0-service
 
 # Power HAL
 PRODUCT_PACKAGES += \
     android.hardware.power@1.0-impl \
     power.xb4780
+
+# DRM HAL
+PRODUCT_PACKAGES += \
+    android.hardware.drm@1.0-impl \
+    android.hardware.drm@1.0-service
 
 $(call inherit-product, hardware/ingenic/xb4780/libGPU/gpu.mk)
 
@@ -252,3 +277,27 @@ PRODUCT_PROPERTY_OVERRIDES +=    \
 PRODUCT_PACKAGES += \
     Launcher3 \
     ChromePublic
+
+PRODUCT_PROPERTY_OVERRIDES += \
+   ro.vendor.vndk.version=26.1.0
+
+PRODUCT_PACKAGES += \
+   android.hardware.graphics.mapper@2.0.vndk-sp-gen \
+   android.hardware.graphics.common@1.0.vndk-sp-gen \
+   android.hardware.graphics.allocator@2.0.vndk-sp-gen \
+   libcutils.vndk-sp-gen \
+   libc++.vndk-sp-gen \
+   libhardware.vndk-sp-gen \
+   libutils.vndk-sp-gen \
+   libbacktrace.vndk-sp-gen \
+   libbase.vndk-sp-gen \
+   libhidlbase.vndk-sp-gen \
+   libhidltransport.vndk-sp-gen \
+   libhwbinder.vndk-sp-gen \
+   libunwind.vndk-sp-gen \
+   liblzma.vndk-sp-gen
+
+PRODUCT_PACKAGES += \
+   libunwind.vndk-ext-gen \
+   liblzma.vndk-ext-gen \
+   libcrypto.vndk-ext-gen

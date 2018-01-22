@@ -106,5 +106,8 @@ ifeq ($(HOST_OS),linux)
   endif
 endif
 
-BOARD_SEPOLICY_DIRS += \
-	device/ingenic/npm801/sepolicy
+BOARD_SEPOLICY_DIRS +=  device/ingenic/npm801/sepolicy/vendor
+BOARD_PLAT_PRIVATE_SEPOLICY_DIR := device/ingenic/npm801/sepolicy/private
+
+DEVICE_MANIFEST_FILE := device/ingenic/npm801/config/manifest.xml
+DEVICE_MATRIX_FILE   := device/ingenic/npm801/config/compatibility_matrix.xml
