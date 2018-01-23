@@ -111,3 +111,5 @@ BOARD_PLAT_PRIVATE_SEPOLICY_DIR := device/ingenic/npm801/sepolicy/private
 
 DEVICE_MANIFEST_FILE := device/ingenic/npm801/config/manifest.xml
 DEVICE_MATRIX_FILE   := device/ingenic/npm801/config/compatibility_matrix.xml
+
+BOARD_VNDK_VERSION := current
